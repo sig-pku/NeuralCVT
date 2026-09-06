@@ -32,7 +32,7 @@ def train_model():
 
     val_data=[]
     for cf in conf.val:
-        data= MeshGraphDataset(conf.preprocessing.training_file_dir,cf.filelist_path,cf.load_full_dataset,cf.size_dataset,cf.sample_strategy,cf.num_seeds_min,cf.num_seeds_max)
+        data= MeshGraphDataset(conf.preprocessing.training_file_dir,cf.filelist_path,cf.load_full_dataset,cf.size_dataset,cf.num_seeds_min,cf.num_seeds_max)
         data = torch_geometric.loader.DataLoader(data, batch_size=cf.batch_size, shuffle=False, pin_memory=cf.pin_memory,num_workers=cf.num_workers)
         val_data.append(data)
 

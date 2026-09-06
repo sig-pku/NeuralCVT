@@ -111,7 +111,6 @@ val:
       3: [20,10]  # stage 3
     num_seeds_min: 1000
     num_seeds_max: 1000
-    sample_strategy: random_on_pc 
     filelist_path: ${preprocessing.filelist_dir}/filelist_val.txt
     load_full_dataset: False
     size_dataset: 50
