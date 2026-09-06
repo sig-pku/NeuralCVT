@@ -4,6 +4,20 @@
 
 The environment setup is based on Conda and has been tested on Linux servers without sudo access.
 
+Create the conda environment:
+
+```bash
+conda create -n ncvt python=3.10 -y
+conda activate ncvt
+```
+
+This repository uses [Git LFS](https://git-lfs.com/) to manage model checkpoint files. Install and initialize Git LFS before cloning:
+
+```bash
+conda install -c conda-forge git-lfs
+git lfs install
+```
+
 Clone the repository together with all submodules:
 
 ```bash
@@ -17,6 +31,7 @@ If a CMake environment is not already available, set up one and build Geogram us
 conda create -n cmake-env cmake -y
 conda activate cmake-env
 conda install -y gcc_linux-64 gxx_linux-64
+
 cd geogram && mkdir build && cd build
 cmake ..  -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc \
@@ -24,13 +39,8 @@ cmake ..  -DCMAKE_BUILD_TYPE=Release \
           -DGEOGRAM_WITH_GRAPHICS=OFF \
           -DGEOGRAM_WITH_LUA=OFF
 make -j$(nproc)
+
 cd ../..
-```
-
-Create the python environment:
-
-```bash
-conda create -n ncvt python=3.10 -y
 conda activate ncvt
 ```
 
@@ -58,14 +68,6 @@ Install other dependencies:
 
 ```bash
 pip install -r requirements.txt
-```
-
-This repository uses Git LFS to manage model checkpoint files. If Git LFS is not installed, install it and download the files:
-
-```bash
-conda install -c conda-forge git-lfs
-git lfs install
-git lfs pull
 ```
 
 ## Inference with Pretrained Models
