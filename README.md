@@ -14,7 +14,7 @@ conda activate ncvt
 This repository uses [Git LFS](https://git-lfs.com/) to manage model checkpoint files. Install and initialize Git LFS before cloning:
 
 ```bash
-conda install -c conda-forge git-lfs
+conda install -c conda-forge git-lfs -y
 git lfs install
 ```
 
@@ -23,25 +23,6 @@ Clone the repository together with all submodules:
 ```bash
 git clone --recurse-submodules https://github.com/sig-pku/NeuralCVT.git
 cd NeuralCVT
-```
-
-If a CMake environment is not already available, set up one and build Geogram using the following steps:
-
-```bash
-conda create -n cmake-env cmake -y
-conda activate cmake-env
-conda install -y gcc_linux-64 gxx_linux-64
-
-cd geogram && mkdir build && cd build
-cmake ..  -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc \
-          -DCMAKE_CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++ \
-          -DGEOGRAM_WITH_GRAPHICS=OFF \
-          -DGEOGRAM_WITH_LUA=OFF
-make -j$(nproc)
-
-cd ../..
-conda activate ncvt
 ```
 
 Install PyTorch:
@@ -68,6 +49,22 @@ Install other dependencies:
 
 ```bash
 pip install -r requirements.txt
+```
+
+If a CMake environment is not already available, set up one and build Geogram using the following steps:
+
+```bash
+conda install -y gcc_linux-64 gxx_linux-64
+
+cd geogram && mkdir build && cd build
+cmake ..  -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc \
+          -DCMAKE_CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++ \
+          -DGEOGRAM_WITH_GRAPHICS=OFF \
+          -DGEOGRAM_WITH_LUA=OFF
+make -j$(nproc)
+
+cd ../..
 ```
 
 ## Inference with Pretrained Models
