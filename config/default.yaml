@@ -1,0 +1,144 @@
+name: default
+mode: train
+stage: 1
+gpu_id: 0  # only support single GPU
+random_seed: 0
+experiment_data_dir: experiment_data
+
+preprocessing:
+  point_cloud_size: 50000
+  raw_dataset_dir: /path/to/your/raw/dataset  # Replace with your local path.
+  training_file_dir: /path/to/save/your/training/files  # Replace with your local path.
+  filelist_dir: ${experiment_data_dir}/filelists/your_filelist_name
+  split_ratio: 0.9
+
+logging:
+  log_dir: ${experiment_data_dir}/logs/${name}/stage${stage}
+  model_info_dir: ${experiment_data_dir}/checkpoints/${name}/stage${stage}
+  save_model_every_epoches: 1000
+
+network:
+  input_feature:
+    pos:
+      num_pe_freqs: 6
+    normal:
+      num_pe_freqs: 6
+
+  graph_unet:  # geometry encoder
+    knn: 6
+    depth: 6
+    num_res_blocks_per_layer: 2
+    out_channels: 256
+
+  sub_graph_unet:  # seed encoder
+    knn: 6
+    depth: 6
+    in_channels: 256
+    out_channels: 256
+    num_res_blocks_per_layer: 3
+
+  mlp:  # seed decoder
+    num_layers: 4
+    hidden_channels: 256
+
+  gru:
+    hidden_channels: 256
+    use_proj_feature: True
+    concat_pos: True
+
+train:
+  batch_size: 4
+  num_epochs: {1: 600, 2: 200, 3: 200}
+  num_workers: 16
+  pin_memory: False
+  num_iters_min: 5
+  num_iters_max: 5
+  use_grad_clipping: True
+  grad_clip_norm: 0.1
+  grad_accum_steps: 1
+  optimizer: 
+    lr: 3e-3
+    weight_decay: 1e-4
+  scheduler:
+    decay_type: cosine
+    warmup_ratio: 0.01
+  num_seeds_min: 500
+  num_seeds_max: 3000
+  filelist_path: ${preprocessing.filelist_dir}/filelist_train.txt
+  load_full_dataset: False
+  size_dataset: 1000  # enable if "load_full_dataset = False"
+  data_augmentation:
+    start_epoch: {1: 0, 2: 0, 3: 0}
+    forward_iters_max: {1: 0, 2: 10, 3: 0}
+  
+  strategy:
+    model_s1: &model_s1 ${experiment_data_dir}/checkpoints/${name}/stage1/latest.pkl
+    model_s2: &model_s2 ${experiment_data_dir}/checkpoints/${name}/stage2/latest.pkl
+    1:  # stage 1
+      train_from_scratch: True
+    2:  # stage 2
+      train_from_scratch: False
+      pretrained_model: *model_s1
+      pre_inference_s1: 
+        model: *model_s1
+        num_iters: 5
+    3:  # stage 3
+      train_from_scratch: False
+      pretrained_model: *model_s2
+      pre_inference_s1: 
+        model: *model_s1
+        num_iters: 5
+      pre_inference_s2: 
+        model: *model_s2
+        num_iters: 5
+
+  loss:
+    weight: 
+      # [CVT, Reg, NA, Rel]
+      1: [5e-3, 0.5, 0, 0]  # stage 1
+      2: [5e-3, 0.5, 50, 0]  # stage 2
+      3: [5e-3, 0.5, 0, 1e-2]  # stage 3
+
+val:
+  - &val_base
+    batch_size: 4
+    num_workers: 8
+    pin_memory: False
+    num_iters: {1: 20, 2: 10, 3: 5}
+    pre_inference_iters:
+      1: [0,0]  # stage 1
+      2: [20,0]  # stage 2
+      3: [20,10]  # stage 3
+    num_seeds_min: 1000
+    num_seeds_max: 1000
+    sample_strategy: random_on_pc 
+    filelist_path: ${preprocessing.filelist_dir}/filelist_val.txt
+    load_full_dataset: False
+    size_dataset: 50
+
+test:
+  checkpoint:
+    dir:
+      1: ${experiment_data_dir}/checkpoints/${name}/stage1
+      2: ${experiment_data_dir}/checkpoints/${name}/stage2
+      3: ${experiment_data_dir}/checkpoints/${name}/stage3
+    epoch: {1: -1, 2: -1, 3: -1}  # -1 means the latest checkpoint
+  batch_size: 8
+  num_workers: 4
+  size_pc: 50000  # size of discrete point cloud
+  num_seeds: 1000
+  num_iters: {1: 20, 2: 10, 3: 5}
+  project_seeds: False  # whether to project the optimized seeds onto the mesh surface
+  test_mesh_dir: ${experiment_data_dir}/test_mesh/samples
+  output_dir: ${experiment_data_dir}/output
+  geogram_path: geogram/build
+
+hydra:  
+  # stay in the current directory
+  job:
+    chdir: false
+  run:
+    dir: .
+
+defaults:  
+  - override hydra/job_logging: disabled  # disable main.log.
