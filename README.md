@@ -11,14 +11,6 @@ git clone --recurse-submodules https://github.com/sig-pku/NeuralCVT.git
 cd NeuralCVT
 ```
 
-This repository uses Git LFS to manage model checkpoint files. If Git LFS is not installed, install it and download the files:
-
-```bash
-conda install -c conda-forge git-lfs
-git lfs install
-git lfs pull
-```
-
 If a CMake environment is not already available, set up one and build Geogram using the following steps:
 
 ```bash
@@ -32,6 +24,7 @@ cmake ..  -DCMAKE_BUILD_TYPE=Release \
           -DGEOGRAM_WITH_GRAPHICS=OFF \
           -DGEOGRAM_WITH_LUA=OFF
 make -j$(nproc)
+cd ../..
 ```
 
 Create the python environment:
@@ -65,6 +58,14 @@ Install other dependencies:
 
 ```bash
 pip install -r requirements.txt
+```
+
+This repository uses Git LFS to manage model checkpoint files. If Git LFS is not installed, install it and download the files:
+
+```bash
+conda install -c conda-forge git-lfs
+git lfs install
+git lfs pull
 ```
 
 ## Inference with Pretrained Models
