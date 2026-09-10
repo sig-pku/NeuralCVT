@@ -102,7 +102,7 @@ class CVTLoss(torch.nn.Module):
             rel_na_split = self.rel_na_loss(site_wise_na[0], site_wise_na[-1], num_seeds)
             rel_na = torch.mean(rel_na_split)
             
-        return [cvt[-1],na_mean[-1],reg_max[-1],rel_na]
+        return [cvt[-1],reg_max[-1],na_mean[-1],rel_na]
 
     def forward(self,pc: Tensor,normal: Tensor,sites:list,num_seeds:Tensor)->Tensor:
         '''

@@ -88,7 +88,7 @@ def train_model():
             param.requires_grad = False
 
     data_labels_train= (["loss/[a] Total", "loss/[b] CVT",
-                         "loss/[d] NA","loss/[c] Reg", "loss/[e] Rel_NA"])
+                         "loss/[c] Reg", "loss/[d] NA", "loss/[e] Rel_NA"])
     
     data_labels_val= (["evaluation/[a] CVT","evaluation/[b] Reg",
                        "evaluation/[c] NA","evaluation/[d] Rel_NA"])

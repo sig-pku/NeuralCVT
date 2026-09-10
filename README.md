@@ -1,10 +1,19 @@
-# Neural CVT
+<h1 align="center">
+    Neural Centroidal Voronoi Tessellations
+</h1>
+
+<p align="center">
+    <a href="https://arxiv.org/abs/2609.08497"><img src='https://img.shields.io/badge/arXiv-Paper-red?logo=arxiv&logoColor=white' alt='arXiv'></a>
+    <a href='https://martin-jc-xu.github.io/projects/NCVT/'><img src='https://img.shields.io/badge/Project_Page-Website-green?logo=googlechrome&logoColor=white' alt='Project Page'></a>
+</p>
+
+This repository is the official code release for the paper "Neural Centroidal Voronoi Tessellations". This paper is published in ACM Transactions on Graphics (SIGGRAPH ASIA 2026).
 
 ## Environment Setup
 
-The environment setup is based on Conda and has been tested on Linux servers without sudo access.
+This project uses Conda for environment management. The setup has been tested on Linux servers without `sudo` access.
 
-This repository uses [Git LFS](https://git-lfs.com/) to manage model checkpoint files. Install and initialize Git LFS before cloning:
+This repository uses [Git LFS](https://git-lfs.com/) to store model checkpoints. Install and initialize Git LFS before cloning:
 
 ```bash
 conda create -n git-lfs-env git-lfs -y
@@ -12,14 +21,14 @@ conda activate git-lfs-env
 git lfs install
 ```
 
-Clone the repository together with all submodules:
+Clone the repository and initialize all submodules:
 
 ```bash
 git clone --recurse-submodules https://github.com/sig-pku/NeuralCVT.git
 cd NeuralCVT
 ```
 
-If a CMake environment is not already available, set up one and build Geogram using the following steps:
+If CMake is not already available in your environment, create a dedicated Conda environment and build Geogram as follows:
 
 ```bash
 conda create -n cmake-env cmake -y
@@ -70,11 +79,11 @@ Install other dependencies:
 pip install -r requirements.txt
 ```
 
-## Inference with Pretrained Models
+## Inference with the Pretrained Model
 
-Pretrained model checkpoints are available in `experiment_data/checkpoints/pretrained_model`, and example meshes for evaluation are provided in `experiment_data/test_mesh/samples`.
+The pretrained model checkpoints are available in `experiment_data/checkpoints/pretrained_model`. Example meshes for evaluation are provided in `experiment_data/test_mesh/samples`.
 
-Run the following command to perform inference with the pretrained model:
+Run the following command to perform inference:
 
 ```bash
 python main.py --config-name test_pretrained
@@ -82,23 +91,23 @@ python main.py --config-name test_pretrained
 
 The generated results are saved under `experiment_data/output`:
 
-- `optimized_seeds` contains the final optimized seed results produced by the neural network.
-- `remesh` contains the extracted meshes.
+- `optimized_seeds`: final seed positions optimized by the neural network.
+- `remesh`: meshes extracted from the optimized seeds.
 
 Inference settings can be configured in `config/test_pretrained.yaml`.
 
-## Train a New Model
+## Training a New Model
 
 The complete configuration for data preparation, training, and testing is provided in `config/default.yaml`.
 
 ### Generate Training Data
 
-The model is trained on the [Thingi10K dataset](https://ten-thousand-models.appspot.com). You can download by clicking **Download** on the website and using Google Drive.
+The model is trained on the [Thingi10K dataset](https://ten-thousand-models.appspot.com). You can download the datasetby clicking **Download** on the website and using Google Drive.
 
-Before generating data, modify the following paths under `preprocessing` in `config/default.yaml`:
+Before generating the training data, update the following paths under `preprocessing` in `config/default.yaml`:
 
-- `raw_dataset_dir`: local path to the raw dataset.
-- `training_file_dir`: local path for generated training files.
+- `raw_dataset_dir`: path to the raw dataset.
+- `training_file_dir`: directory in which the generated training files will be stored.
 
 Generate the training data with:
 
@@ -108,17 +117,17 @@ python main.py mode=data_gen --config-name default
 
 ### Create Filelists
 
-Set the output directory for filelists through `preprocessing -> filelist_dir`, then run:
+Set the output directory through `preprocessing.filelist_dir` in `config/default.yaml`, then run:
 
 ```bash
 python main.py mode=split_dataset --config-name default
 ```
 
-This command creates the train and evaluation filelists. The filelists used in our experiments are provided in `experiment_data/filelists/default`. Although the split is randomly generated, all network tuning experiments were based on these filelists; using them can produce results that are more consistent with our experiments. To reuse them directly, set `filelist_dir` to this directory without generating new filelists.
+This command generates the training and evaluation filelists. The filelists used in our experiments are provided in `experiment_data/filelists/default`. Although the split was generated randomly, all network tuning experiments were based on these filelists. Reusing them may produce results that are more consistent with our experiments. To reuse them directly, set `preprocessing.filelist_dir` to this directory.
 
 ### Train
 
-Run the following stages in order:
+Run the following training stages in order:
 
 ```bash
 python main.py stage=1 --config-name default
@@ -140,4 +149,14 @@ After training is complete, run inference with:
 
 ```bash
 python main.py mode=test --config-name default
+```
+
+## Citation
+```
+@article{Xu2026NCVT,
+  title   = {Neural Centroidal Voronoi Tessellations},
+  author  = {Jiacheng Xu and Bo Pang and Rui Xu and Xiaocheng Zhang and Yang Liu and Fei Zhu and Guoping Wang and Peng-Shuai Wang},
+  journal = {ACM Trans. Graph. (SIGGRAPH ASIA)},
+  year    = {2026}
+}
 ```
