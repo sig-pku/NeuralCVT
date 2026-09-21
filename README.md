@@ -135,6 +135,8 @@ python main.py stage=2 --config-name default
 python main.py stage=3 --config-name default
 ```
 
+> **Note:** Training may not be fully reproducible under different hardware or environment configurations, which can change the random behavior. If you observe clear non-convergence during Stage 1, please adjust the hyperparameters according to your results, such as the regularization loss weight in `train.loss.weight` of the configuration file.
+
 Training curves can be monitored with:
 
 ```bash
