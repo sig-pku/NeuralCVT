@@ -135,7 +135,7 @@ python main.py stage=2 --config-name default
 python main.py stage=3 --config-name default
 ```
 
-> **Note:** Training may not be fully reproducible under different hardware or environment configurations. If you observe clear non-convergence during Stage 1, please adjust the hyperparameters according to your results, such as increasing the regularization loss weight in `train.loss.weight` of the configuration file.
+> **Note:** Training may not be fully reproducible under different environment configurations, especially for longer inference sequences than those used in training. If you observe clear non-convergence during Stage 1 on such longer inference sequences, please enable data augmentation, for example by setting the Stage 1 value of `forward_iters_max` to 10.
 
 Training curves can be monitored with:
 
